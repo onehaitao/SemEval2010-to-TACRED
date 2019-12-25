@@ -15,6 +15,7 @@ A simple tool for converting data format from SemEval2010 to TACRED.
 ```
 python convert.py
 ```
+3. The result file will be store in `./result/` folde
 
 ## Reference Link:
 * https://github.com/ChristophAlt/StAn
