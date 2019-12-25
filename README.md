@@ -1,5 +1,5 @@
 # SemEval2010-to-TACRED
-A simple tool for converting data format from SemEval2010 to TACRED.
+A simple tool for converting the format of data from SemEval2010 to TACRED.
 
 ## Environment Requirements
 * python 3.6
@@ -17,6 +17,9 @@ python convert.py
 ```
 3. The result file will be store in `./result/` folder.
 
-## Reference Link:
+## Note
+The result  of the conversion may not be ideal! Hope to make comments.
+
+## Reference Link
 * https://github.com/ChristophAlt/StAn
 * https://github.com/waxin/ToTACRED
