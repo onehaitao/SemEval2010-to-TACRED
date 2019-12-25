@@ -6,7 +6,7 @@ import json
 import re
 from tqdm import tqdm
 from stanfordcorenlp import StanfordCoreNLP
-nlp = StanfordCoreNLP(r'/data6/htwang/resource/stanford/stanford-corenlp-full-2018-10-05')
+nlp = StanfordCoreNLP(r'./resource/stanford-corenlp-full-2018-10-05')
 props = dict(
     annotators="tokenize,pos,ner,depparse",
     pipelineLanguage="en",
@@ -100,30 +100,27 @@ def remove_postion_indicators(token, pos, ner, deprel, head):
 def convert(src_file, des_file):
     with open(src_file, 'r', encoding='utf-8') as fr:
         file_data = fr.readlines()
-    fw = open(des_file, 'w', encoding='utf-8')
-    for i in tqdm(range(0, len(file_data), 4)):
-        try:
-            data = {}
-            s = file_data[i].strip().split('\t')
-            assert len(s) == 2
-            data['id'] = s[0]
-            data['docid'] = s[0]
-            data['comment'] = file_data[i+2].strip()
-            sen_res = sentence_process(s[1])
-            rel_res = relation_process(file_data[i+1])
-            meta = {**data, **sen_res, **rel_res}
-            json.dump(meta, fw, ensure_ascii=False)
-            fw.write('\n')
-        except:
-            print(file_data[i])
 
-    fw.close()
+    data = []
+    for i in tqdm(range(0, len(file_data), 4)):
+        meta = {}
+        s = file_data[i].strip().split('\t')
+        assert len(s) == 2
+        meta['id'] = s[0]
+        meta['docid'] = s[0]
+        meta['comment'] = file_data[i+2].strip()
+        sen_res = sentence_process(s[1])
+        rel_res = relation_process(file_data[i+1])
+        data.append({**meta, **sen_res, **rel_res})
+
+    with open(des_file, 'w', encoding='utf-8') as fw:
+        json.dump(data, fw, ensure_ascii=False)
 
 
 if __name__ == '__main__':
-    train_path = '/data6/htwang/resource/data/SemEval2010_task8_all_data/SemEval2010_task8_training/TRAIN_FILE.TXT'
-    test_path = '/data6/htwang/resource/data/SemEval2010_task8_all_data/SemEval2010_task8_testing_keys/TEST_FILE_FULL.TXT'
-    train_json = 'train.json'
-    test_json = 'test.json'
-    convert(train_path, train_json)
-    convert(test_path, test_json)
+    train_src = './SemEval2010_task8_all_data/SemEval2010_task8_training/TRAIN_FILE.TXT'
+    test_src = './SemEval2010_task8_all_data/SemEval2010_task8_testing_keys/TEST_FILE_FULL.TXT'
+    train_des = './result/train.json'
+    test_des = './result/test.json'
+    convert(train_src, train_des)
+    convert(test_src, test_des)
