@@ -124,3 +124,4 @@ if __name__ == '__main__':
     test_des = './result/test.json'
     convert(train_src, train_des)
     convert(test_src, test_des)
+    nlp.close()
