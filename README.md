@@ -10,7 +10,7 @@ A simple tool for converting the format of data from SemEval2010 to TACRED.
 * [SemEval2010 Task8](https://drive.google.com/file/d/0B_jQiLugGTAkMDQ5ZjZiMTUtMzQ1Yy00YWNmLWJlZDYtOWY1ZDMwY2U4YjFk/view?sort=name&layout=list&num=50) \[[paper](https://www.aclweb.org/anthology/S10-1006.pdf)\]
 
 ## Usage
-1. [Download CoreNlp](https://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip), put it in `./tools/` folder and then unzip it.
+1. [Download CoreNlp](https://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip), put it in `./resource/` folder and then unzip it.
 2. Use the following command to convert data:
 ```
 python convert.py
