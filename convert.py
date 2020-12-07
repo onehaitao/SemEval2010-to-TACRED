@@ -36,7 +36,14 @@ def relation_process(raw_relation):
 
 
 def sentence_process(raw_sentence):
-    sentence = raw_sentence[1:-1]  # remove quotes
+    # remove quotes
+    sentence = raw_sentence[1:-1]
+    # remove postion indicators
+    head_entity = re.findall(r'<e1>(.*?)</e1>', sentence)[0]
+    tail_entity = re.findall(r'<e2>(.*?)</e2>', sentence)[0]
+    sentence = re.sub(r'</?e[12]>', ' ', sentence)
+    sentence = re.sub(r'\s+', ' ', sentence)
+
     res = json.loads(nlp.annotate(sentence, properties=props))
     sents = res['sentences']
     token = [x['word'] for sent in sents for x in sent['tokens']]
@@ -51,50 +58,37 @@ def sentence_process(raw_sentence):
     head = [x[1] for x in dep]
     lengths = map(len, [token, pos, ner, deprel, head])
     assert len(set(lengths)) == 1
-    assert '<e1>' in token
-    assert '<e2>' in token
-    assert '</e1>' in token
-    assert '</e2>' in token
-    return remove_postion_indicators(token, pos, ner, deprel, head)
+    subj_start, subj_end = find_entity_pos(token, head_entity)
+    obj_start, obj_end = find_entity_pos(token, tail_entity)
 
-
-def remove_postion_indicators(token, pos, ner, deprel, head):
-    subj_start = subj_end = obj_start = obj_end = 0
-    pure_token = []
-    pure_pos = []
-    pure_ner = []
-    pure_deprel = []
-    pure_head = []
-    for i, word in enumerate(token):
-        if '<e1>' == word:
-            subj_start = len(pure_token)
-            continue
-        if '</e1>' == word:
-            subj_end = len(pure_token) - 1
-            continue
-        if '<e2>' in word:
-            obj_start = len(pure_token)
-            continue
-        if '</e2>' in word:
-            obj_end = len(pure_token) - 1
-            continue
-        pure_token.append(word)
-        pure_pos.append(pos[i])
-        pure_ner.append(ner[i])
-        pure_deprel.append(deprel[i])
-        pure_head.append(head[i])
-    res = dict(
-        token=pure_token,
+    ret = dict(
+        token=token,
         subj_start=subj_start,
         subj_end=subj_end,
         obj_start=obj_start,
         obj_end=obj_end,
-        stanford_pos=pure_pos,
-        stanford_ner=pure_ner,
-        stanford_deprel=pure_deprel,
-        stanford_head=pure_head
+        stanford_pos=pos,
+        stanford_ner=ner,
+        stanford_deprel=deprel,
+        stanford_head=head
     )
-    return res
+    return ret
+
+
+def find_entity_pos(token, entity):
+    entity_list = nlp.word_tokenize(entity)
+    size = len(entity_list)
+    start = end = None
+    for i in range(0, len(token)-size+1):
+        window = token[i:i+size]
+        if window == entity_list:
+            start = i
+            end = i + size - 1
+    if start is None or end is None:
+        raise ValueError('Entity {} is not found!'.format(entity))
+        import pdb
+        pdb.set_trace()
+    return start, end
 
 
 def convert(src_file, des_file):
